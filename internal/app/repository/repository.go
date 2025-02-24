@@ -10,8 +10,8 @@ type Repository struct {
 	DiseaseRepositoryInterface
 }
 
-func New(filepath string) *Repository {
+func New(rulesFilepath string, symptomsFilepath string) *Repository {
 	return &Repository{
-		DiseaseRepositoryInterface: NewDiseaseRepository(filepath),
+		DiseaseRepositoryInterface: NewDiseaseRepository(rulesFilepath, symptomsFilepath),
 	}
 }

@@ -13,7 +13,7 @@ func main() {
 	a := app.New()
 	w := a.NewWindow(constants.WindowName.String())
 
-	r := repository.New("Болезни кожи/Правила.txt")
+	r := repository.New("Болезни кожи/Правила.txt", "Болезни кожи/Симптомы.txt")
 	p := parser.NewChainParser(r)
 	d := design.MustLoad(p, w)
 

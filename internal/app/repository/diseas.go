@@ -8,7 +8,8 @@ import (
 )
 
 type DiseaseRepository struct {
-	filepath string
+	rulesFilepath    string
+	symptomsFilepath string
 }
 
 type Rule struct {
@@ -18,14 +19,15 @@ type Rule struct {
 	RuleStr    string
 }
 
-func NewDiseaseRepository(filepath string) *DiseaseRepository {
+func NewDiseaseRepository(rulesFilepath string, symptomsFilepath string) *DiseaseRepository {
 	return &DiseaseRepository{
-		filepath: filepath,
+		rulesFilepath:    rulesFilepath,
+		symptomsFilepath: symptomsFilepath,
 	}
 }
 
 func (r *DiseaseRepository) GetSymptomsList() (*[]string, error) {
-	symptoms, err := utils.ReadFileLines("Болезни кожи/Симптомы.txt")
+	symptoms, err := utils.ReadFileLines(r.symptomsFilepath)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +35,7 @@ func (r *DiseaseRepository) GetSymptomsList() (*[]string, error) {
 }
 
 func (r *DiseaseRepository) GetRules() (*[]Rule, error) {
-	fileLines, err := utils.ReadFileLines(r.filepath)
+	fileLines, err := utils.ReadFileLines(r.rulesFilepath)
 	if err != nil {
 		return nil, err
 	}
@@ -45,6 +47,22 @@ func (r *DiseaseRepository) GetRules() (*[]Rule, error) {
 	}
 
 	return &rules, nil
+}
+
+func (r *DiseaseRepository) GetDiseases() (*[]string, error) {
+	rules, err := r.GetRules()
+	if err != nil {
+		return nil, err
+	}
+
+	var diseases []string
+	for _, rule := range *rules {
+		if rule.IsDisease {
+			diseases = append(diseases, rule.Result)
+		}
+	}
+
+	return &diseases, nil
 }
 
 func parseRule(ruleStr string) Rule {
@@ -74,20 +92,4 @@ func parseRule(ruleStr string) Rule {
 		IsDisease:  isDisease,
 		RuleStr:    ruleStr,
 	}
-}
-
-func (r *DiseaseRepository) GetDiseases() (*[]string, error) {
-	rules, err := r.GetRules()
-	if err != nil {
-		return nil, err
-	}
-
-	var diseases []string
-	for _, rule := range *rules {
-		if rule.IsDisease {
-			diseases = append(diseases, rule.Result)
-		}
-	}
-
-	return &diseases, nil
 }
