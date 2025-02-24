@@ -4,13 +4,13 @@ import (
 	"log"
 	"strings"
 
-	"lr1/internal/app/parser"
-	"lr1/internal/constants"
-
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
+
+	"lr1/internal/app/parser"
+	"lr1/internal/constants"
 )
 
 func Tab1(p *parser.ChainParser, w fyne.Window) *fyne.Container {
@@ -26,21 +26,21 @@ func Tab1(p *parser.ChainParser, w fyne.Window) *fyne.Container {
 	diagnoseLabel := widget.NewLabel(constants.DiagnoseLabel.String())
 	historyLabel := widget.NewLabel(constants.HistoryLabel.String())
 	applyBtn := widget.NewButton(constants.FindBtn.String(), func() {
-		if len(checkedSymptoms) != 0 {
-			diagnoseLabel.SetText(constants.DiagnoseLabel.String())
-			historyLabel.SetText(constants.HistoryLabel.String())
-
-			diagnose, history := p.Forward.Parse(checkedSymptoms)
-
-			diagnoseLabel.SetText(diagnoseLabel.Text + diagnose)
-			historyLabel.SetText(historyLabel.Text + strings.Join(history, "\n"))
+		if len(checkedSymptoms) == 0 {
+			dialog.ShowInformation(
+				constants.ErrorTitle.String(),
+				constants.NotCheckedSymptoms.String(),
+				w,
+			)
 			return
 		}
-		dialog.ShowInformation(
-			constants.ErrorTitle.String(),
-			constants.NotCheckedSymptoms.String(),
-			w,
-		)
+		diagnoseLabel.SetText(constants.DiagnoseLabel.String())
+		historyLabel.SetText(constants.HistoryLabel.String())
+
+		diagnose, history := p.Forward.Parse(checkedSymptoms)
+
+		diagnoseLabel.SetText(diagnoseLabel.Text + diagnose)
+		historyLabel.SetText(historyLabel.Text + strings.Join(history, "\n"))
 	})
 
 	content := container.NewVBox(

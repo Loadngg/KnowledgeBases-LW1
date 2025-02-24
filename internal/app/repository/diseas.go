@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"lr1/internal/constants"
 	"lr1/internal/utils"
 )
 
@@ -68,7 +69,7 @@ func (r *DiseaseRepository) GetDiseases() (*[]string, error) {
 func parseRule(ruleStr string) Rule {
 	parts := strings.Split(strings.TrimSpace(ruleStr), " ТО ")
 	if len(parts) != 2 {
-		panic(fmt.Sprintf("Неверный формат правила: %s", ruleStr))
+		panic(fmt.Sprintf(constants.IncorrectRuleFormat.String(), ruleStr))
 	}
 
 	conditionPart := strings.TrimPrefix(parts[0], "ЕСЛИ ")

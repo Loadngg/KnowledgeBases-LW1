@@ -7,7 +7,11 @@ type Forward interface {
 }
 
 type Backward interface {
-	Parse(checkedSymptoms []string, diagnose string) (bool, []string)
+	Parse(checkedSymptoms []string,
+		diagnose string,
+		showConfirm func(string, func(bool)),
+		onComplete func(bool, []string),
+	)
 }
 
 type ChainParser struct {

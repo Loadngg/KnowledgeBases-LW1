@@ -1,11 +1,11 @@
 package design
 
 import (
-	"lr1/internal/app/parser"
-	"lr1/internal/constants"
-
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+
+	"lr1/internal/app/parser"
+	"lr1/internal/constants"
 )
 
 func MustLoad(p *parser.ChainParser, w fyne.Window) *container.AppTabs {

@@ -2,6 +2,7 @@ package parser
 
 import (
 	"lr1/internal/app/repository"
+	"lr1/internal/constants"
 	"lr1/internal/utils"
 )
 
@@ -36,7 +37,7 @@ func (p *ForwardParser) Parse(checkedSymptoms []string) (string, []string) {
 				newFactAdded = true
 
 				if rule.IsDisease {
-					return rule.Result, history
+					return rule.Result, utils.HumanReadableRules(history)
 				}
 			}
 		}
@@ -46,5 +47,5 @@ func (p *ForwardParser) Parse(checkedSymptoms []string) (string, []string) {
 		}
 	}
 
-	return "Болезнь не найдена", nil
+	return constants.DiseaseNotFound.String(), nil
 }

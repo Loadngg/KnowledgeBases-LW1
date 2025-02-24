@@ -1,17 +1,29 @@
 package design
 
 import (
+	"fmt"
 	"log"
 	"strings"
-
-	"lr1/internal/app/parser"
-	"lr1/internal/constants"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
+
+	"lr1/internal/app/parser"
+	"lr1/internal/constants"
 )
+
+func ShowSymptomQuestion(symptom string, w fyne.Window, callback func(bool)) {
+	dialog.ShowConfirm(
+		constants.SymptomQuestionTitle.String(),
+		fmt.Sprintf(constants.SymptomQuestionMsg.String(), symptom),
+		func(answer bool) {
+			callback(answer)
+		},
+		w,
+	)
+}
 
 func Tab2(p *parser.ChainParser, w fyne.Window) *fyne.Container {
 	diseases, err := p.Repository.GetDiseases()
@@ -37,33 +49,39 @@ func Tab2(p *parser.ChainParser, w fyne.Window) *fyne.Container {
 	diagnoseLabel := widget.NewLabel(constants.DiagnoseIsCorrect.String())
 	historyLabel := widget.NewLabel(constants.HistoryLabel.String())
 	applyBtn := widget.NewButton(constants.FindBtn.String(), func() {
-		if selectedDisease != "" && len(checkedSymptoms) > 0 {
-			diagnoseLabel.SetText(constants.DiagnoseIsCorrect.String())
-			historyLabel.SetText(constants.HistoryLabel.String())
-
-			diagnose, history := p.Backward.Parse(checkedSymptoms, selectedDisease)
-
-			var diagnoseStr string
-			if diagnose {
-				diagnoseStr = diagnoseLabel.Text + "Да"
-			} else {
-				diagnoseStr = diagnoseLabel.Text + "Нет"
+		if selectedDisease == "" || len(checkedSymptoms) == 0 {
+			var errMsg string
+			if selectedDisease == "" {
+				errMsg = constants.NotSelectedDisease.String()
 			}
-			diagnoseLabel.SetText(diagnoseStr)
-			historyLabel.SetText(historyLabel.Text + strings.Join(history, "\n"))
+			if len(checkedSymptoms) == 0 {
+				errMsg = errMsg + "\n" + constants.NotCheckedSymptoms.String()
+			}
+			dialog.ShowInformation(
+				constants.ErrorTitle.String(),
+				errMsg,
+				w,
+			)
 			return
 		}
-		var errMsg string
-		if selectedDisease == "" {
-			errMsg = constants.NotSelectedDisease.String()
-		}
-		if len(checkedSymptoms) == 0 {
-			errMsg = errMsg + "\n" + constants.NotCheckedSymptoms.String()
-		}
-		dialog.ShowInformation(
-			constants.ErrorTitle.String(),
-			errMsg,
-			w,
+
+		diagnoseLabel.SetText(constants.DiagnoseIsCorrect.String())
+		historyLabel.SetText(constants.HistoryLabel.String())
+
+		p.Backward.Parse(
+			checkedSymptoms,
+			selectedDisease,
+			func(symptom string, callback func(bool)) {
+				ShowSymptomQuestion(symptom, w, callback)
+			},
+			func(diagnose bool, history []string) {
+				if diagnose {
+					diagnoseLabel.SetText(constants.DiagnoseIsCorrect.String() + constants.Yes.String())
+				} else {
+					diagnoseLabel.SetText(constants.DiagnoseIsCorrect.String() + constants.No.String())
+				}
+				historyLabel.SetText(historyLabel.Text + strings.Join(history, "\n"))
+			},
 		)
 	})
 
